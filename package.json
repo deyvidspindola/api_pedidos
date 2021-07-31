@@ -1,0 +1,32 @@
+{
+  "name": "api_pedidos",
+  "version": "1.0.0",
+  "description": "Api de Pedidos",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon -- -r esm -r dotenv/config index.js",
+    "start": "pm2 start index.js --watch --no-daemon --node-args=\"-r esm -r dotenv/config\""
+  },
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deyvidspindola/api_pedidos.git"
+  },
+  "author": "Deyvid Spíndola",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/deyvidspindola/api_pedidos/issues"
+  },
+  "homepage": "https://github.com/deyvidspindola/api_pedidos#readme",
+  "dependencies": {
+    "consign": "^0.1.6",
+    "esm": "^3.2.25",
+    "mongoose": "^5.13.5",
+    "pm2": "^5.1.0",
+    "restify": "^8.5.1"
+  },
+  "devDependencies": {
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.12"
+  }
+}

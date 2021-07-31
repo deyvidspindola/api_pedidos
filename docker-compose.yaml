@@ -1,0 +1,28 @@
+version: "3.7"
+
+services: 
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    ports: 
+      - ${DB_PORT}:27017
+    environment:
+      MONGO_INITDB_DATABASE: ${DB_NAME}
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASS}
+    volumes: 
+      - './data:/data/db'
+
+  api:
+    image: node:14.7
+    container_name: api_pedidos
+    restart: always
+    depends_on: 
+      - mongo
+    ports: 
+      - ${SERVER_PORT}:${SERVER_PORT}
+    volumes: 
+      - ./:/usr/src/app
+    working_dir: /usr/src/app
+    command: npm run start
