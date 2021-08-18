@@ -1,17 +1,10 @@
-import { PedidoModel } from '../models/pedido'
+const pedidoRepository = require('../repositories/pedidoRepository')
 
 module.exports = server => {
 
     server.get('/pedidos', async (req, res) => {
 
-        try{
-
-            const pedidos = await PedidoModel.find()
-            return res.send({ pedidos })
-
-        } catch (err) {
-            return res.send(500, err)
-        }
+        pedidoRepository.list(res)
 
     })
 
