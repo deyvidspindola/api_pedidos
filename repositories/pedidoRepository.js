@@ -1,18 +1,18 @@
-import { ProdutoModel } from '../models/produto'
 import { PedidoModel } from '../models/pedido'
-import { reload } from 'pm2'
 
 class pedidoRepository {
-    
-    async list(res) {
 
-        try{
+    async all(res) {
+
+        try {
 
             const pedidos = await PedidoModel.find()
             return res.send({ pedidos })
 
         } catch (err) {
+
             return res.send(500, err)
+
         }
 
     }
@@ -21,12 +21,8 @@ class pedidoRepository {
 
         try {
 
-            if(!this.checkStock(data)){
-                return res.send(401, 'Quantidade solicitada indisponivel')
-            }
-
-            const produto = await PedidoModel.create(data)
-            return res.send({ produto })
+            const pedido = await PedidoModel.create(data)
+            return res.send(201, { pedido })
 
         } catch (err) {
 
@@ -36,35 +32,14 @@ class pedidoRepository {
 
     }
 
-    async checkStock(data) {
-
-        const produto = await ProdutoModel.findOne({ nome: data.produtos.nome })
-        if (produto.estoque <= data.produtos.quantidade) {
-            return false
-        }
-        return true
-
-    }
-
-    async updateStock(data) {
+    async update(filter, update, res) {
 
         try {
 
-            
-
-        }  catch (err) {
-
-            return err
-
-        }
-
-    }    
-
-    async update(data, id, res) {
-
-        try {
-
-            const produto = await ProdutoModel.findById(id)
+            const pedido = await PedidoModel.findOneAndUpdate(filter, update, {
+                new: true
+            });
+            return res.send({ pedido })
 
         } catch (err) {
 
@@ -74,11 +49,12 @@ class pedidoRepository {
 
     }
 
-    async delete(id, res) {
+    async delete(filter, res) {
 
         try {
 
-            
+            await PedidoModel.findOneAndDelete(filter)
+            return res.send('Removido com sucesso!')            
 
         } catch (err) {
 
@@ -87,53 +63,7 @@ class pedidoRepository {
         }
 
     }
-
-/*
-    async criarPedido(pedido) {
-
-        if (!this.validaEstoque(pedido))
-            return "Quantidade indisponivel"
-        
-        // this.baixarEstoque(pedido.produto)
-
-        //const pedido = await PedidoModel.create(req.body)
-        //return pedido
-
-
-
-    }
-
-    validaEstoque(produto) {
-
-        try {
-
-            const estoque = 8
-            if (estoque <= pedido.produto.quantidade)
-                return false
-            
-            return true
-
-        } catch (err) {
-
-
-
-        }
-
-    }
-
-    baixarEstoque(produto) {
-
-        try {
-
-
-
-        } catch (err) {
-
-
-
-        }
-
-    }*/
 
 }
-module.exports = new pedidoRepository; 
+
+module.exports = new pedidoRepository

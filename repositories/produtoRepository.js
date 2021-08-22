@@ -2,16 +2,36 @@ import { ProdutoModel } from '../models/produto'
 
 class produtoRepository {
 
-    async list(res) {
+    async find(filter, callback) {
 
         try {
 
+            if(filter) {
+                const produto = await ProdutoModel.findOne(filter)
+                return callback(produto)
+            }
+
             const produtos = await ProdutoModel.find()
-            return res.send({ produtos })
+            return callback(produtos)
 
         } catch (err) {
 
-            return res.send(500, err)
+            return callback(err)
+
+        }
+
+    }
+
+    async findBy(filter, callback) {
+
+        try {
+
+            const produto = await ProdutoModel.findOne(filter)
+            return callback(produto)
+
+        } catch (err) {
+
+            return callback(err)
 
         }
 
@@ -22,7 +42,7 @@ class produtoRepository {
         try {
 
             const produto = await ProdutoModel.create(data)
-            return res.send({ produto })
+            return res.send(201, { produto })
 
         } catch (err) {
 
@@ -32,25 +52,29 @@ class produtoRepository {
 
     }
 
-    async update(data, id, res) {
+    async update(filter, update, callback) {
 
         try {
 
-            const produto = await ProdutoModel.findById(id)
+            const produto = await ProdutoModel.findOneAndUpdate(filter, update, {
+                new: true
+            });
+            return callback(produto)
 
         } catch (err) {
 
-            return res.send(500, err)
+            return callback(err)
 
         }
 
     }
 
-    async delete(id, res) {
+    async delete(filter, res) {
 
         try {
 
-            
+            await ProdutoModel.findOneAndDelete(filter)
+            return res.send('Removido com sucesso!')            
 
         } catch (err) {
 

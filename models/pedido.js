@@ -10,11 +10,7 @@ const PedidoSchema = new mongoose.Schema({
     produtos: [{
         nome: String,
         quantidade: Number
-    }],
-    data_pedido: { 
-        type: Date, 
-        default: Date.now 
-    }
+    }]
 
 },
 {
