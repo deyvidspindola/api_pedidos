@@ -4,10 +4,15 @@ class produtoService {
 
     async all(res) {
         
+        const produto = await produtoRepository.find(null)
+        return res.send({produto})
+        
+
+/*
         produtoRepository.find(null, (response) => {
             res.send({response})
         })
-    
+  */  
     }
 
     async create(data, res) {
