@@ -19,4 +19,4 @@ const PedidoSchema = new mongoose.Schema({
   toObject: { virtuals: true, getters: true },
 });
 
-export const PedidoModel = mongoose.model('Pedido', PedidoSchema)
+export const PedidoModel = mongoose.model('pedidos', PedidoSchema)

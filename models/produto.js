@@ -12,4 +12,4 @@ const ProdutoSchema = new mongoose.Schema({
   toObject: { virtuals: true, getters: true },
 });
 
-export const ProdutoModel = mongoose.model('produto', ProdutoSchema)
+export const ProdutoModel = mongoose.model('produtos', ProdutoSchema)
