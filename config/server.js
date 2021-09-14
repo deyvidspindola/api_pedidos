@@ -1,5 +1,5 @@
-import restify from 'restify'
-import consign from 'consign'
+const restify = require('restify')
+const consign = require('consign')
 
 export const server = restify.createServer()
 

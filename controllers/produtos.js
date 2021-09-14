@@ -2,7 +2,21 @@ const produtoService = require('../services/produtoService')
 
 module.exports = server => {
 
-    server.get('/produtos', async (req, res) => produtoService.all(res))
+    server.get('/produtos/:filter', async (req, res) => {
+
+        try{
+
+            const filter = (req.params.filter) ? req.params.filter : null
+            const products = await produtoService.all(filter)
+            res.send(products)
+        
+        } catch(err){
+            
+            res.send(500, err.message)
+        
+        }
+
+    })
 
     server.post('/produtos', async (req, res) => {
 

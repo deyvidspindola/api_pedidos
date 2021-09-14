@@ -1,40 +1,31 @@
 const produtoRepository = require('../repositories/produtoRepository')
 
-class produtoService {
+const all = async param => {
 
-    async all(res) {
+    try {
         
-        produtoRepository.find(null, (response) => {
-            res.send({response})
-        })
-  
-    }
+        param = makeParam(param)
+        return await produtoRepository.find(param)
 
-    async create(data, res) {
-
-        produtoRepository.create(data, res)
+    } catch (err) {
+        
+        throw new Error(err)
 
     }
 
-    async update(find, findName, update, res) {
-
-        const filter = this.filter(find, findName)
-        produtoRepository.update(filter, update, (response) => {
-            res.send(response)
-        })
-
-    }
-
-    async delete(find, findName, res) {
-
-        const filter = this.filter(find, findName)
-        produtoRepository.delete(filter, res)
-
-    }
-
-    filter(find, findName) {
-        return { [findName] : find }
-    }
 }
 
-module.exports = new produtoService
+const filter = (find, findName) => {
+    return { [findName] : find }
+}
+
+const makeParam = param => {
+    console.log(param)
+    if(param != null){
+        const value = param.split('=')
+        return filter(value[1], value[0])
+    }
+    return null
+}
+
+module.exports = {all}
