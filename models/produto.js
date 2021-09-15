@@ -2,8 +2,16 @@ const mongoose = require('mongoose')
 
 const ProdutoSchema = new mongoose.Schema({
 
-    nome: String,
-    quantidade: Number
+  nome: {
+    type: String,
+    required: true,
+    unique: true
+  },
+  quantidade: {
+    type: Number,
+    required: true,
+    min: 0
+  }
 
 },
 {

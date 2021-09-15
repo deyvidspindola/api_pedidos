@@ -53,8 +53,7 @@ const update = async (productId, data) => {
 
     try {
 
-        if(await checkIfHasProduct(productId))
-            return await ProdutoModel.findByIdAndUpdate(productId, data, {new: true})
+        return await ProdutoModel.findByIdAndUpdate(productId, data, {new: true})
 
     } catch (err) {
 

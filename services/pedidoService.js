@@ -35,7 +35,7 @@ const create = async data => {
     try {
 
         if (!await checkIfHasStock(data))
-            throw new Error('Produto sem estoque disponivel')
+            throw new Error('Um ou mais produtos estão sem estoque')
 
         if (await updateStockProduct(data))
             return await pedidoRepository.create(data)
@@ -96,17 +96,18 @@ const checkIfHasStock = async data => {
 
     try {
 
-        const hasStock = true
-        data.produtos.forEach(async prod => {
+        hasStock = true
+        for(const prod of data.produtos) {
             if (hasStock) {
                 const product = await productService.getById(prod.produto_id)
+                
                 if (!product) 
                     throw new Error ('Produto não encontrado')
-        
+
                 if (product.quantidade < prod.quantidade)
-                    hasStock = false 
-            }               
-        })
+                    hasStock = false
+            }
+        }
 
         return (hasStock) ? true : false
 
@@ -123,7 +124,7 @@ const updateStockProduct = async (data, type = 'down') => {
     try {
         
         const erro = false
-        data.produtos.forEach(async prod => {
+        for (const prod of data.produtos) {
             if (!erro) {
                 const product = await productService.getById(prod.produto_id)
                 if (!product) 
@@ -138,7 +139,7 @@ const updateStockProduct = async (data, type = 'down') => {
                 if (!await productService.update(prod.produto_id, {'quantidade': quantidade}))
                     erro = true
             }
-        })
+        }
 
         return (!erro) ? true : false
 
