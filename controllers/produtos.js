@@ -2,15 +2,15 @@ const produtoService = require('../services/produtoService')
 
 module.exports = server => {
 
-    server.get('/produtos/:filter', async (req, res) => {
+    server.get('/produtos/:search', async (req, res) => {
 
-        try{
+        try {
 
-            const filter = (req.params.filter) ? req.params.filter : null
-            const products = await produtoService.all(filter)
+            const search = (req.params.search) ? req.params.search : null
+            const products = await produtoService.get(search)
             res.send(products)
         
-        } catch(err){
+        } catch(err) {
             
             res.send(500, err.message)
         
@@ -18,25 +18,52 @@ module.exports = server => {
 
     })
 
-    server.post('/produtos', async (req, res) => {
+    server.post('/produto', async (req, res) => {
 
-        const produto = req.body
-        produtoService.create(produto, res)
+        try {
+
+            const data = req.body
+            const produto = await produtoService.create(data)
+            res.send(201, produto)
+
+        } catch (err) {
+
+            res.send(500, err.message)
+       
+        }
 
     })
 
-    server.put('/produtos/:id', async (req, res) => {
+    server.put('/produto/:productId', async (req, res) => {
 
-        const find = req.params.id
-        const data = req.body
-        produtoService.update(find, '_id',  data, res)
+        try {
+
+            const productId = req.params.productId
+            const data = req.body
+            const product = await produtoService.update(productId, data)
+            res.send(product)
+
+        } catch (err) {
+
+            res.send(500, err.message)
+
+        }
 
     })
 
-    server.del('/produtos/:id', async (req, res) => {
+    server.del('/produto/:productId', async (req, res) => {
 
-        const find = req.params.id
-        produtoService.delete(find, '_id', res)
+        try {
+
+            const productId = req.params.productId
+            await produtoService.destroy(productId)
+            res.send('Produto removido com sucesso!')
+
+        } catch (err) {
+
+            res.send(500, err.message)
+
+        }
 
     })
 

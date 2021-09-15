@@ -1,76 +1,163 @@
 const pedidoRepository = require('../repositories/pedidoRepository')
-const produtoRepository = require('../repositories/produtoRepository')
+const productService = require('../services/produtoService')
 
-class pedidoService {
+const get = async search => {
 
-    async all(res) {
+    try {
         
-        pedidoRepository.all(res)
-    
-    }
+        search = filter(search)
+        return await pedidoRepository.get(search)
 
-    async create(data, res) {
-
-        this.checkStock(data, (response) => {
-
-            if(!response)
-                res.send('Não tem estoque')
-                
-            this.updateStock(data)
-
-            pedidoRepository.create(data, res)
-
-        })
+    } catch (err) {
+        
+        throw new Error(err)
 
     }
-
-    async update(find, findName, update, res) {
-
-        const filter = this.filter(find, findName)
-        pedidoRepository.update(filter, update, res)
-
-    }
-
-    async delete(find, findName, res) {
-
-        const filter = this.filter(find, findName)
-        pedidoRepository.delete(filter, res)
-
-    }
-
-    filter(find, findName) {
-        return { [findName] : find }
-    }
-
-    checkStock(data, callback) {
-
-        produtoRepository.findBy({ nome: data.produtos.nome }, (produto) => {
-
-            if (produto.quantidade < data.produtos.quantidade) {
-                return callback(false)
-            }
-
-            return callback(true)
-
-        })
-
-    }
-
-    updateStock(data) {
-
-        produtoRepository.find({ nome: data.produtos.nome }, (produto) => {
-
-            const quantidade = parseInt(produto.quantidade) - parseInt(data.produtos.quantidade)
-            const filter = this.filter(produto._id, '_id')
-            
-            produtoRepository.update(filter, {'quantidade': quantidade}, (response) => {
-                console.log(response)
-            })
-
-        })
-
-    } 
 
 }
 
-module.exports = new pedidoService
+const getById = async orderId => {
+
+    try {
+        
+        return await pedidoRepository.getById(orderId)
+
+    } catch (err) {
+        
+        throw new Error(err)
+
+    }
+
+}
+
+const create = async data => {
+
+    try {
+
+        if (!await checkIfHasStock(data))
+            throw new Error('Produto sem estoque disponivel')
+
+        if (await updateStockProduct(data))
+            return await pedidoRepository.create(data)
+
+    } catch (err) {
+
+        throw new Error(err)
+
+    }
+
+}
+
+const update = async (orderId, data) => {
+
+    try {
+
+        if (checkIfHasOrder(orderId))
+            return await pedidoRepository.update(orderId, data)
+
+    } catch (err) {
+
+        throw new Error(err)
+
+    }
+
+}
+
+const destroy = async orderId => {
+
+    try {
+
+        const order = await checkIfHasOrder(orderId)
+        if (order && await updateStockProduct(order, 'up'))
+            await pedidoRepository.destroy(orderId)
+
+    } catch (err) {
+
+        throw new Error(err)
+
+    }
+
+}
+
+const filter = search => {
+
+    if (search != null) {
+
+        const arr = search.split('=')
+        return { [arr[1]] : arr[0] }
+
+    }
+
+    return null
+
+}
+
+const checkIfHasStock = async data => {
+
+    try {
+
+        const hasStock = true
+        data.produtos.forEach(async prod => {
+            if (hasStock) {
+                const product = await productService.getById(prod.produto_id)
+                if (!product) 
+                    throw new Error ('Produto não encontrado')
+        
+                if (product.quantidade < prod.quantidade)
+                    hasStock = false 
+            }               
+        })
+
+        return (hasStock) ? true : false
+
+    } catch (err) {
+
+        throw new Error (err)
+
+    }
+
+}
+
+const updateStockProduct = async (data, type = 'down') => {
+
+    try {
+        
+        const erro = false
+        data.produtos.forEach(async prod => {
+            if (!erro) {
+                const product = await productService.getById(prod.produto_id)
+                if (!product) 
+                    throw new Error ('Produto não encontrado')
+        
+                if (type == 'down') {
+                    quantidade = parseInt(product.quantidade) - parseInt(prod.quantidade)
+                } else {
+                    quantidade = parseInt(product.quantidade) + parseInt(prod.quantidade)
+                }
+                
+                if (!await productService.update(prod.produto_id, {'quantidade': quantidade}))
+                    erro = true
+            }
+        })
+
+        return (!erro) ? true : false
+
+    } catch (err) {
+
+        throw new Error (err)
+
+    }
+
+}
+
+const checkIfHasOrder = async orderId => {
+
+    const hasOrder = await pedidoRepository.getById(orderId)
+    if (!hasOrder)
+        throw new Error('Pedido não encontrado!')
+
+    return hasOrder
+
+}
+
+module.exports = {get, getById, create, update, destroy}

@@ -8,6 +8,7 @@ const PedidoSchema = new mongoose.Schema({
         email: String
     }],
     produtos: [{
+        produto_id: String,
         nome: String,
         quantidade: Number
     }]

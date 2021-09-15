@@ -1,11 +1,11 @@
 const produtoRepository = require('../repositories/produtoRepository')
 
-const all = async param => {
+const get = async search => {
 
     try {
         
-        param = makeParam(param)
-        return await produtoRepository.find(param)
+        search = filter(search)
+        return await produtoRepository.get(search)
 
     } catch (err) {
         
@@ -15,17 +15,85 @@ const all = async param => {
 
 }
 
-const filter = (find, findName) => {
-    return { [findName] : find }
-}
+const getById = async productId => {
 
-const makeParam = param => {
-    console.log(param)
-    if(param != null){
-        const value = param.split('=')
-        return filter(value[1], value[0])
+    try {
+        
+        return await produtoRepository.getById(productId)
+
+    } catch (err) {
+        
+        throw new Error(err)
+
     }
-    return null
+
 }
 
-module.exports = {all}
+const create = async data => {
+
+    try {
+
+        return await produtoRepository.create(data)
+
+    } catch (err) {
+
+        throw new Error(err)
+
+    }
+
+}
+
+const update = async (productId, data) => {
+
+    try {
+
+        if(await checkIfHasProduct(productId))
+            return await produtoRepository.update(productId, data)
+
+    } catch (err) {
+
+        throw new Error(err)
+
+    }
+
+}
+
+const destroy = async productId => {
+
+    try {
+
+        if(await checkIfHasProduct(productId))
+            await produtoRepository.destroy(productId)
+
+    } catch (err) {
+
+        throw new Error(err)
+
+    }
+
+}
+
+const filter = search => {
+
+    if (search != null) {
+
+        const arr = search.split('=')
+        return { [arr[1]] : arr[0] }
+
+    }
+
+    return null
+
+}
+
+const checkIfHasProduct = async productId => {
+
+    const hasProduct = await produtoRepository.getById(productId)
+    if (!hasProduct)
+        throw new Error('Produto não encontrado!')
+
+    return true
+
+}
+
+module.exports = {get, getById, create, update, destroy}

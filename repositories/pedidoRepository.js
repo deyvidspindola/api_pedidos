@@ -1,69 +1,80 @@
 import { PedidoModel } from '../models/pedido'
 
-class pedidoRepository {
+const get = async search => {
 
-    async all(res) {
+    try{
 
-        try {
-
-            const pedidos = await PedidoModel.find()
-            return res.send({ pedidos })
-
-        } catch (err) {
-
-            return res.send(500, err)
-
+        if(search != null) {
+            return await PedidoModel.find(search).exec()
         }
 
-    }
+        return await PedidoModel.find()
 
-    async create(data, res) {
-
-        try {
-
-            const pedido = await PedidoModel.create(data)
-            return res.send(201, { pedido })
-
-        } catch (err) {
-
-            return res.send(500, err)
-
-        }
-
-    }
-
-    async update(filter, update, res) {
-
-        try {
-
-            const pedido = await PedidoModel.findOneAndUpdate(filter, update, {
-                new: true
-            });
-            return res.send({ pedido })
-
-        } catch (err) {
-
-            return res.send(500, err)
-
-        }
-
-    }
-
-    async delete(filter, res) {
-
-        try {
-
-            await PedidoModel.findOneAndDelete(filter)
-            return res.send('Removido com sucesso!')            
-
-        } catch (err) {
-
-            return res.send(500, err)
-
-        }
+    } catch (err) {
+        
+        throw new Error(err)
 
     }
 
 }
 
-module.exports = new pedidoRepository
+const getById = async orderId => {
+
+    try{
+
+        if(!orderId)
+            throw new Error('Informe o id do Pedido!')
+
+        return await PedidoModel.findById(orderId).exec()
+
+    } catch (err) {
+        
+        throw new Error(err)
+
+    }
+
+}
+
+const create = async data => {
+
+    try {
+
+        return await PedidoModel.create(data)
+
+    } catch (err) {
+
+        throw new Error(err)
+
+    }
+
+}
+
+const update = async (orderId, data) => {
+
+    try {
+
+        return await PedidoModel.findByIdAndUpdate(orderId, data, {new: true})
+
+    } catch (err) {
+
+        throw new Error(err)
+
+    }
+
+}
+
+const destroy = async orderId => {
+
+    try {
+
+        await PedidoModel.findByIdAndDelete(orderId)
+
+    } catch (err) {
+
+        throw new Error(err)
+
+    }
+
+}
+
+module.exports = {get, getById, create, update, destroy}

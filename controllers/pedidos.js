@@ -2,27 +2,68 @@ const pedidoService = require('../services/pedidoService')
 
 module.exports = server => {
 
-    server.get('/pedidos', async (req, res) => pedidoService.all(res))
+    server.get('/pedidos/:search', async (req, res) => {
 
-    server.post('/pedidos', async (req, res) => {
+        try {
 
-        const pedido = req.body
-        pedidoService.create(pedido, res)
+            const search = (req.params.search) ? req.params.search : null
+            const orders = await pedidoService.get(search)
+            res.send(orders)
+        
+        } catch(err) {
+            
+            res.send(500, err.message)
+        
+        }
 
     })
 
-    server.put('/pedidos/:id', async (req, res) => {
+    server.post('/pedido', async (req, res) => {
 
-        const find = req.params.id
-        const data = req.body
-        pedidoService.update(find, '_id',  data, res)
+        try {
+
+            const data = req.body
+            const order = await pedidoService.create(data)
+            res.send(201, order)
+
+        } catch (err) {
+
+            res.send(500, err.message)
+       
+        }
 
     })
 
-    server.del('/pedidos/:id', async (req, res) => {
+    server.put('/pedido/:orderId', async (req, res) => {
 
-        const find = req.params.id
-        pedidoService.delete(find, '_id', res)
+        try {
+
+            const orderId = req.params.orderId
+            const data = req.body
+            const order = await pedidoService.update(orderId, data)
+            res.send(order)
+
+        } catch (err) {
+
+            res.send(500, err.message)
+
+        }
+
+    })
+
+    server.del('/pedido/:orderId', async (req, res) => {
+
+        try {
+
+            const orderId = req.params.orderId
+            await pedidoService.destroy(orderId)
+            res.send('Pedido removido com sucesso!')
+
+        } catch (err) {
+
+            res.send(500, err.message)
+
+        }
 
     })
 
